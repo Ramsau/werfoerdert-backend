@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
-from .models import Question
+from .models import Grant
 
 
-class QuestionSerializer(serializers.HyperlinkedModelSerializer):
+class GrantSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Question
-        fields = ['text', 'type', 'id']
+        model = Grant
+        fields = ['id', 'is_grant', 'name_de', 'name_en', 'parent', 'expires', 'questions']
+        depth = 1
