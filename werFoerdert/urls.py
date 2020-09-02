@@ -21,7 +21,7 @@ from rest_framework import routers
 from api import views
 
 router = routers.DefaultRouter()
-router.register(r'grants', views.GrantViewSet)
+router.register(r'questionnaire', views.QuestionnaireViewSet, basename='questionnaire')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

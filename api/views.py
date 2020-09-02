@@ -8,11 +8,10 @@ from rest_framework.decorators import action
 import datetime
 
 from .models import Question, Requirement, Grant
-from .serializers import GrantSerializer
+from .serializers import QuestionnaireSerializer
 
-class GrantViewSet(viewsets.ViewSet):
-    queryset = Question.objects.all()
-    serializer_class = GrantSerializer
+
+class QuestionnaireViewSet(viewsets.ViewSet):
 
     @action(methods=['get', 'post'], detail=False, url_path='next', url_name='')
     def get_questions(self, request):
@@ -83,9 +82,6 @@ class GrantViewSet(viewsets.ViewSet):
             grants_fullyMet = grants_partiallyMet.filter(
                 ~Q(requirements__in=requirements_open)
             )
-            print(grants_partiallyMet.count(), grants_fullyMet.count())
-            for grant in grants_fullyMet:
-                print('grant met', grant.name_de)
         else:
             data = {}
             grants_partiallyMet = Grant.objects.filter(
@@ -108,10 +104,10 @@ class GrantViewSet(viewsets.ViewSet):
         )).order_by('openrequirements_count')
 
         if grants_next.exists():
-            queryset = grants_next.first()
+            grant = grants_next.first()
         else:
-            queryset = None
+            grant = None
 
 
-        serializer = self.serializer_class(queryset)
+        serializer = QuestionnaireSerializer(current_grant=grant, grants_met=grants_fullyMet.filter(is_grant=True))
         return Response(serializer.data)
