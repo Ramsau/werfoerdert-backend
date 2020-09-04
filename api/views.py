@@ -10,6 +10,8 @@ import datetime
 from .models import Question, Requirement, Grant
 from .serializers import QuestionnaireSerializer
 
+from .helpers import int_default, bool_default, date_default
+
 
 class QuestionnaireViewSet(viewsets.ViewSet):
 
@@ -26,13 +28,19 @@ class QuestionnaireViewSet(viewsets.ViewSet):
             whens_int = [
                 When(
                     Q(question__id=k, question__type__id=1),
-                    then=V(v if str(v).isdigit() else 0, output_field=IntegerField())
+                    then=V(int_default(v), output_field=IntegerField())
                 ) for k, v in data.items()
             ]
             whens_bool = [
                 When(
                     Q(question__id=k, question__type__id=2),
-                    then=V(v is True, output_field=BooleanField())
+                    then=V(bool_default(v), output_field=BooleanField())
+                ) for k, v in data.items()
+            ]
+            whens_date = [
+                When(
+                    Q(question__id=k, question__type__id=3),
+                    then=V(date_default(v), output_field=DateField())
                 ) for k, v in data.items()
             ]
             requirements_answered = Requirement.objects.filter(
@@ -47,6 +55,11 @@ class QuestionnaireViewSet(viewsets.ViewSet):
                     *whens_bool,
                     default=None,
                     output_field=BooleanField(),
+                ),
+                answer_date=Case(
+                    *whens_date,
+                    default=None,
+                    output_field=DateField(),
                 ),
             )
 
@@ -68,6 +81,18 @@ class QuestionnaireViewSet(viewsets.ViewSet):
                     Q(bool__isnull=True) |
                     Q(answer_bool=F('bool'))
                 ),
+                Q(
+                    Q(date_exact__isnull=True) |
+                    Q(answer_date=F('date_exact'))
+                ),
+                Q(
+                    Q(date_lt__isnull=True) |
+                    Q(answer_date__lt=F('date_lt'))
+                ),
+                Q(
+                    Q(date_gt__isnull=True) |
+                    Q(answer_date__gt=F('date_gt'))
+                ),
             )
 
             requirements_unmet = requirements_answered.filter(~Q(id__in=requirements_met))
@@ -83,7 +108,6 @@ class QuestionnaireViewSet(viewsets.ViewSet):
                 ~Q(requirements__in=requirements_open)
             )
         else:
-            data = {}
             grants_partiallyMet = Grant.objects.filter(
                 Q(expires__gte=datetime.date.today()) | Q(expires__isnull=True)
             )
