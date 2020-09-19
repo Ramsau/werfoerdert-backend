@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Grant
+from .models import Grant, Question
 
 
 class GrantSerializerQuestions(serializers.ModelSerializer):
@@ -16,6 +16,7 @@ class GrantSerializer(serializers.ModelSerializer):
         fields = ['id', 'is_grant', 'name_de', 'name_en', 'parent', 'expires']
         depth = 1
 
+
 class QuestionnaireSerializer(serializers.Serializer):
     current_grant = GrantSerializerQuestions()
     grants_met = GrantSerializer(many=True)
@@ -23,3 +24,10 @@ class QuestionnaireSerializer(serializers.Serializer):
     def __init__(self, **kwargs):
         # cast keyword arguments to dict
         super().__init__(kwargs)
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['text_de', 'text_en', 'type']
+        depth = 0

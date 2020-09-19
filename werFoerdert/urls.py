@@ -22,6 +22,7 @@ from api import views
 
 router = routers.DefaultRouter()
 router.register(r'questionnaire', views.QuestionnaireViewSet, basename='questionnaire')
+router.register(r'admin', views.AdminViewSet, basename='admin')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
