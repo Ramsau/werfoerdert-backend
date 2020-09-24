@@ -146,5 +146,5 @@ class AdminViewSet(viewsets.ViewSet):
 
     @action(methods=['get'], detail=False, url_path='get_grants', url_name='')
     def get_grants(self, request):
-        serializer = AdminGrantSerializer(Grant.objects.filter(parent=None), many=True)
+        serializer = AdminGrantSerializer(Grant.objects.filter(parent__isnull=True), many=True)
         return Response(serializer.data)

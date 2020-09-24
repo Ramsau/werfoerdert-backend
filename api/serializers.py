@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_recursive.fields import RecursiveField
 
 from .models import Grant, Question
 
@@ -34,8 +35,19 @@ class QuestionSerializer(serializers.ModelSerializer):
         depth = 0
 
 
-class AdminGrantSerializer(serializers.ModelSerializer):
+class AdminGrantSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    is_grant = serializers.BooleanField()
+    name_de = serializers.CharField()
+    name_en = serializers.CharField()
+    expires = serializers.DateField()
+    children = serializers.SerializerMethodField()
+
     class Meta:
-        model = Grant
-        fields = ['id', 'is_grant', 'name_de', 'name_en', 'parent', 'expires','children']
-        depth = 5
+        fields = ['id', 'is_grant', 'name_de', 'name_en', 'expires', 'children']
+        depth = 0
+
+    def get_children(self, grant):
+        serializer = AdminGrantSerializer(grant.children, many=True)
+        return serializer.data
+
