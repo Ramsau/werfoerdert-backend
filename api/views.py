@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 import datetime
 
 from .models import Question, Requirement, Grant
-from .serializers import QuestionnaireSerializer, QuestionSerializer
+from .serializers import QuestionnaireSerializer, QuestionSerializer, GrantSerializer, AdminGrantSerializer
 
 from .helpers import int_default, bool_default, date_default
 
@@ -142,4 +142,9 @@ class AdminViewSet(viewsets.ViewSet):
     @action(methods=['get'], detail=False, url_path='get_questions', url_name='')
     def get_questions(self, request):
         serializer = QuestionSerializer(Question.objects.all(), many=True)
+        return Response(serializer.data)
+
+    @action(methods=['get'], detail=False, url_path='get_grants', url_name='')
+    def get_grants(self, request):
+        serializer = AdminGrantSerializer(Grant.objects.filter(parent=None), many=True)
         return Response(serializer.data)
