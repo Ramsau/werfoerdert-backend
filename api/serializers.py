@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_recursive.fields import RecursiveField
 
-from .models import Grant, Question
+from .models import Grant, Question, Requirement
 
 
 class GrantSerializerQuestions(serializers.ModelSerializer):
@@ -14,8 +14,14 @@ class GrantSerializerQuestions(serializers.ModelSerializer):
 class GrantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grant
-        fields = ['id', 'is_grant', 'name_de', 'name_en', 'parent', 'expires']
-        depth = 1
+        fields = ['id',  'is_grant', 'name_de', 'name_en', 'parent', 'expires']
+        depth = 5
+
+
+class RequirementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Requirement
+        fields = ['id', 'question', 'bool', 'int_exact', 'int_lt', 'int_gt', 'date_exact', 'date_lt', 'date_gt']
 
 
 class QuestionnaireSerializer(serializers.Serializer):
@@ -42,9 +48,10 @@ class AdminGrantSerializer(serializers.Serializer):
     name_en = serializers.CharField()
     expires = serializers.DateField()
     children = serializers.SerializerMethodField()
+    requirements = RequirementSerializer(many=True)
 
     class Meta:
-        fields = ['id', 'is_grant', 'name_de', 'name_en', 'expires', 'children']
+        fields = ['id', 'is_grant', 'name_de', 'name_en', 'expires', 'children', 'requirements']
         depth = 0
 
     def get_children(self, grant):
