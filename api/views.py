@@ -148,3 +148,7 @@ class AdminViewSet(viewsets.ViewSet):
     def get_grants(self, request):
         serializer = AdminGrantSerializer(Grant.objects.filter(parent__isnull=True), many=True)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=False, url_path='post_questions', url_name='')
+    def post_questions(self, request):
+

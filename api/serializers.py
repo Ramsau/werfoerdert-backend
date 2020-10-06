@@ -37,7 +37,7 @@ class QuestionnaireSerializer(serializers.Serializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ['text_de', 'text_en', 'type']
+        fields = ['id', 'text_de', 'text_en', 'type']
         depth = 0
 
 
