@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 
 import datetime
 
-from .models import Question, Requirement, Grant
+from .models import Question, Requirement, Grant, QuestionType
 from .serializers import QuestionnaireSerializer, QuestionSerializer, GrantSerializer, AdminGrantSerializer
 
 from .helpers import int_default, bool_default, date_default
@@ -149,6 +149,17 @@ class AdminViewSet(viewsets.ViewSet):
         serializer = AdminGrantSerializer(Grant.objects.filter(parent__isnull=True), many=True)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False, url_path='post_questions', url_name='')
+    @action(methods=['post'], detail=False, url_path='post_question', url_name='')
     def post_questions(self, request):
+        data = request.data
+        if data.get('textDe') \
+                and data.get('textEn') \
+                and data.get('questionType') \
+                and data.get('questionType').isdigit() \
+                and QuestionType.objects.filter(id=int(data['questionType'])).exists():
+            new_question = Question.objects.create(text_de=data.get('textDe'), text_en=data.get('textEn'),type_id=data.get('questionType'))
+            serializer = QuestionSerializer(new_question, many=False)
+            return Response(serializer.data)
+        else:
+            return Response('Bad Request', status=400)
 
