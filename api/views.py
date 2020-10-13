@@ -155,8 +155,10 @@ class AdminViewSet(viewsets.ViewSet):
         if data.get('textDe') \
                 and data.get('textEn') \
                 and data.get('questionType') \
-                and data.get('questionType').isdigit() \
+                and (isinstance(data.get('questionType'), int) or data.get('questionType').isdigit()) \
                 and QuestionType.objects.filter(id=int(data['questionType'])).exists():
+            if data.get('id'):
+                print('test');
             new_question = Question.objects.create(text_de=data.get('textDe'), text_en=data.get('textEn'),type_id=data.get('questionType'))
             serializer = QuestionSerializer(new_question, many=False)
             return Response(serializer.data)
