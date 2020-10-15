@@ -152,6 +152,33 @@ class AdminViewSet(viewsets.ViewSet):
     @action(methods=['post'], detail=False, url_path='post_question', url_name='')
     def post_question(self, request):
         data = request.data
+        if data.get('textDe') \
+                and data.get('textEn') \
+                and data.get('questionType') \
+                and (isinstance(data.get('questionType'), int) or data.get('questionType').isdigit()) \
+                and QuestionType.objects.filter(id=int(data['questionType'])).exists():
+            if data.get('id'):
+                question = Question.objects.get(pk=data.get('id'))
+                question.text_de = data.get('textDe')
+                question.text_en = data.get('textEn')
+                question.type_id = data.get('questionType')
+                question.save()
+                serializer = QuestionSerializer(Question.objects.all(), many=True)
+                return Response(serializer.data)
+            else:
+                new_question = Question.objects.create(text_de=data.get('textDe'), text_en=data.get('textEn'),type_id=data.get('questionType'))
+                serializer = QuestionSerializer(Question.objects.all(), many=True)
+                return Response(serializer.data)
+        else:
+            if not Question.objects.filter(id=data.get('id')).exists():
+                return Response('Bad Request', status=400)
+            else:
+                return Response('Bad Request', status=400)
+
+    @action(methods=['post'], detail=False, url_path='delete_question', url_name='')
+    def delete_question(self, request):
+        print('test')
+        data = request.data
         if data.get('id') \
                 and not data.get('textDe') \
                 and not data.get('textEn') \
@@ -161,22 +188,4 @@ class AdminViewSet(viewsets.ViewSet):
             serializer = QuestionSerializer(Question.objects.all(), many=True)
             return Response(serializer.data)
         else:
-            if data.get('textDe') \
-                    and data.get('textEn') \
-                    and data.get('questionType') \
-                    and (isinstance(data.get('questionType'), int) or data.get('questionType').isdigit()) \
-                    and QuestionType.objects.filter(id=int(data['questionType'])).exists():
-                if data.get('id'):
-                    question = Question.objects.get(pk=data.get('id'))
-                    question.text_de = data.get('textDe')
-                    question.text_en = data.get('textEn')
-                    question.type_id = data.get('questionType')
-                    question.save()
-                    serializer = QuestionSerializer(Question.objects.all(), many=True)
-                else:
-                    new_question = Question.objects.create(text_de=data.get('textDe'), text_en=data.get('textEn'),type_id=data.get('questionType'))
-                    serializer = QuestionSerializer(Question.objects.all(), many=True)
-                return Response(serializer.data)
-            else:
-                return Response('Bad Request', status=400)
-
+            return Response('Bad Request', status=400)
