@@ -170,14 +170,10 @@ class AdminViewSet(viewsets.ViewSet):
                 serializer = QuestionSerializer(Question.objects.all(), many=True)
                 return Response(serializer.data)
         else:
-            if not Question.objects.filter(id=data.get('id')).exists():
-                return Response('Bad Request', status=400)
-            else:
-                return Response('Bad Request', status=400)
+            return Response('Bad Request', status=400)
 
     @action(methods=['post'], detail=False, url_path='delete_question', url_name='')
     def delete_question(self, request):
-        print('test')
         data = request.data
         if data.get('id') \
                 and not data.get('textDe') \
