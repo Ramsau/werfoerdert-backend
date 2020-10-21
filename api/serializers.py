@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_recursive.fields import RecursiveField
 
-from .models import Grant, Question, Requirement
+from .models import Grant, Question, Requirement, QuestionType
 
 
 class GrantSerializerQuestions(serializers.ModelSerializer):
@@ -40,6 +40,11 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = ['id', 'text_de', 'text_en', 'type']
         depth = 0
 
+class QuestionTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionType
+        fields = ['id', 'name_de', 'name_en', 'name_short']
+        depth = 0
 
 class AdminGrantSerializer(serializers.Serializer):
     id = serializers.IntegerField()
